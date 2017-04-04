@@ -12,6 +12,7 @@ class SlashCommand(object):
         self.channel_name = channel_name
         self.command = command
         self.text = text
+        self.text_parts = text.split(' ')
         self.response_url = response_url
         self.team_domain = team_domain
         self.team_id = team_id
@@ -27,3 +28,10 @@ class SlashCommand(object):
         """
         params = {k: str(v) for k, v in parse_qsl(querystring)}
         return cls(**params)
+
+    @property
+    def requested_action(self):
+        if self.text_parts:
+            return self.text_parts[0]
+        else:
+            return ''

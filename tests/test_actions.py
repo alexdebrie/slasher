@@ -24,11 +24,11 @@ class TestActionRegistry(unittest.TestCase):
 
 class TestHelpAction(unittest.TestCase):
 
-    def test_returns_general_help_with_no_text(self): 
+    def test_returns_general_help_with_no_text(self):
         slash = copy.copy(TEST_SLASH_COMMAND)
         slash.text = ''
 
-        expected ="""\
+        expected = """\
 Available commands:
 
 help\t-\tShow the options for this slash command. Use help <action> to show detailed help on an action.

@@ -49,7 +49,7 @@ class SlashResponse(object):
         return {
             'statusCode': 200,
             'body': json.dumps({
-                'text': self.text,
+                'text': str(self.text),
                 'response_type': self.response_type
             })
         }

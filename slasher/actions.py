@@ -25,8 +25,8 @@ class ActionException(Exception):
 
 class ActionMount(type):
     """Metaclass for the BaseAction class. It is used to enable easily hooking
-    in additional actions that subclass BaseAction. 
-    
+    in additional actions that subclass BaseAction.
+
     Any subclass of BaseAction will have a 'registry' attribute that contains
     a dictionary of registered actions where the key is the 'action_name' for
     a class and the value is the class itself.
@@ -67,7 +67,6 @@ class BaseAction(object):
 
     def __init__(self, slash):
         self.slash = slash
-        self.text_parts = self.slash.text.split(' ')
 
     @classmethod
     def name(cls):
@@ -116,13 +115,13 @@ class HelpAction(BaseAction):
 
     def run(self):
         # If the text is one word or less, they just want general help.
-        if len(self.text_parts) < 2:
+        if len(self.slash.text_parts) < 2:
             values = '\n'.join(self.get_all_help_text())
             msg = ("Available commands:\n\n"
                    "{values}".format(values=values))
         # Calling `help <action>`, so find the action if it exists and return detailed help.
         else:
-            detailed_action = self.text_parts[1]
+            detailed_action = self.slash.text_parts[1]
             if detailed_action in self.registry:
                 msg = self.registry[detailed_action].detailed_help()
             else:
