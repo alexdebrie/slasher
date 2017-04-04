@@ -1,4 +1,5 @@
 from functools import wraps
+import os
 
 from slasher.command import SlashCommand
 
@@ -17,5 +18,11 @@ def slasher(f):
 
         s = SlashCommand.from_querystring(body)
         event['slasher'] = s
+
+        # If the user provides a token, authenticate the Slash command.
+        token = os.environ.get('SLASH_TOKEN')
+        if token and token != s.token:
+            raise ValueError('Invalid token')
+
         return f(event, context)
     return wrapper

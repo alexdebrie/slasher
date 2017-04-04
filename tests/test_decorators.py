@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from slasher.decorators import slasher
@@ -30,3 +31,34 @@ class TestSlasher(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             lambda_example(event, '')
+
+    def test_slasher_runs_if_no_slash_token_environment_variable(self):
+        if 'SLASH_TOKEN' in os.environ:
+            del os.environ['SLASH_TOKEN']
+
+        event = TEST_EVENT
+
+        result = lambda_example(event, '')
+
+        self.assertTrue('slasher' in result)
+        self.assertEqual(TEST_SLASH_COMMAND.__dict__, result['slasher'].__dict__)
+
+    def test_slasher_runs_if_slash_token_matches_environment_variable(self):
+        os.environ['SLASH_TOKEN'] = 'TestToken1234'
+        event = TEST_EVENT
+
+        result = lambda_example(event, '')
+
+        self.assertTrue('slasher' in result)
+        self.assertEqual(TEST_SLASH_COMMAND.__dict__, result['slasher'].__dict__)
+
+        del os.environ['SLASH_TOKEN']
+
+    def test_slasher_doesnt_run_if_slash_token_doesnt_match_environment_variable(self):
+        os.environ['SLASH_TOKEN'] = 'NotTheTestToken1234'
+        event = TEST_EVENT
+
+        with self.assertRaises(ValueError):
+            lambda_example(event, '')
+
+        del os.environ['SLASH_TOKEN']
