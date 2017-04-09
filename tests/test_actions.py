@@ -1,7 +1,8 @@
 import copy
 import unittest
 
-from slasher.actions import BaseAction, HelpAction, load_actions
+from slasher.actions import BaseAction, HelpAction, ActionException, load_actions
+from slasher.response import SlashResponse
 from tests.helpers import TEST_SLASH_COMMAND
 
 
@@ -20,6 +21,22 @@ class TestActionRegistry(unittest.TestCase):
 
         self.assertEqual(len(BaseAction.registry), 2)
         self.assertIn('fake', BaseAction.registry)
+
+
+class TestBaseAction(unittest.TestCase):
+
+    def test_respond_method_returns_SlashReponse(self):
+        action = BaseAction('')
+
+        response = action.respond('Test response')
+
+        self.assertTrue(isinstance(response, SlashResponse))
+
+    def test_exception_method_raises_ActionException(self):
+        action = BaseAction('')
+
+        with self.assertRaises(ActionException):
+            action.exception('Test Exception')
 
 
 class TestHelpAction(unittest.TestCase):

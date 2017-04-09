@@ -55,11 +55,17 @@ class BaseAction(object):
     help as well as an example or two.
 
     4) Implement the 'run()' method. This is the method that will be executed
-    when a particular action is called. If you're using the default Slasher
-    handler for Lambda, you should return either a SlashResponse object (preferred),
-    or a string of text to be displayed to the user. If there's an Exceeption,
-    you should raise an ActionException with a message that describes the problem
-    to the calling user.
+    when a particular action is called.
+
+    If you're using the default Slasher handler for Lambda, you should return
+    either a SlashResponse object (preferred), or a string of text to be
+    displayed to the user. There's a helper method on the BaseAction of `respond()`,
+    which takes a `message` and optionally a `response_type` (default is
+    `in_channel`).
+
+    If there's an Exceeption, you should raise an ActionException with a message
+    that describes the problem to the calling user. You can use the `exception()`
+    helper method, which takes a `message` to be raised with the ActionException.
     """
 
     __metaclass__ = ActionMount
@@ -95,6 +101,17 @@ class BaseAction(object):
         """
         raise NotImplementedError()
 
+    def exception(self, message):
+        """Used to raise a known potential Exception in the run() logic.
+        You should include a message that will guide the calling user on how
+        to fix their slash command invocation.
+        """
+        raise ActionException(message)
+
+    def respond(self, message, response_type='in_channel'):
+        """Used for creating a proper response once the run() logic is finished."""
+        return SlashResponse(message, response_type)
+
 
 class HelpAction(BaseAction):
     """Action for when a user calls the command with 'help'. Enables both
@@ -125,10 +142,10 @@ class HelpAction(BaseAction):
             if detailed_action in self.registry:
                 msg = self.registry[detailed_action].detailed_help()
             else:
-                raise ActionException('You requested detailed help on {action}, \
-                                       but there is no action by that name.'.format(action=detailed_action))
+                self.exception('You requested detailed help on {action}, \
+                                but there is no action by that name.'.format(action=detailed_action))
 
-        return SlashResponse.in_channel(msg)
+        return self.respond(msg)
 
     def get_all_help_text(self):
         return ['{action}\t-\t{help}'.format(action=action, help=cls.help())
